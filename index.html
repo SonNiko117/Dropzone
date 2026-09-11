@@ -1,26 +1,671 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DROPZONE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DROPZONE</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top, #20204a 0%, #090914 45%, #050508 100%);
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+    width: min(500px, 100%);
+    margin: auto;
+    padding: 20px 16px 40px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.stats {
+    display: flex;
+    gap: 8px;
+}
+
+.stat {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 7px 10px;
+    font-size: 13px;
+}
+
+.card {
+    background: rgba(20,20,35,.9);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.hero {
+    text-align: center;
+    padding: 28px 18px;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(120,90,255,.18);
+    border: 1px solid rgba(120,90,255,.4);
+    color: #a995ff;
+    border-radius: 50px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+h1 {
+    font-size: 30px;
+    margin: 5px 0;
+}
+
+.subtitle {
+    color: #9999aa;
+    margin-bottom: 22px;
+}
+
+.challenge {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.3;
+    margin: 18px 0;
+}
+
+.answers {
+    display: grid;
+    gap: 10px;
+}
+
+.answer {
+    border: 1px solid #303047;
+    background: #151522;
+    color: white;
+    padding: 15px;
+    border-radius: 14px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.answer:active {
+    transform: scale(.97);
+}
+
+.answer.correct {
+    background: #164d34;
+    border-color: #31d982;
+}
+
+.answer.wrong {
+    background: #541c2b;
+    border-color: #ff5475;
+}
+
+button {
+    font-family: inherit;
+}
+
+.primary {
+    width: 100%;
+    border: 0;
+    background: linear-gradient(135deg, #7657ff, #a044ff);
+    color: white;
+    padding: 15px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.primary:active {
+    transform: scale(.98);
+}
+
+.progress {
+    height: 8px;
+    background: #29293b;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #7657ff, #c15cff);
+    transition: width .4s;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 14px;
+}
+
+.rank {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.rank:last-child {
+    border-bottom: 0;
+}
+
+.position {
+    width: 28px;
+    font-weight: bold;
+    color: #999;
+}
+
+.player {
+    flex: 1;
+}
+
+.xp {
+    color: #a995ff;
+    font-size: 13px;
+}
+
+.hidden {
+    display: none;
+}
+
+.result {
+    text-align: center;
+    padding: 20px;
+}
+
+.big {
+    font-size: 42px;
+    margin: 10px;
+}
+
+.streak {
+    color: #ff9d4d;
+    font-weight: bold;
+}
+
+.footer {
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    margin-top: 25px;
+}
+</style>
 </head>
+
 <body>
 
-  <h1>DROPZONE</h1>
-  <p>Daily Mini-Challenges</p>
+<div class="container">
 
-  <button onclick="play()">Play</button>
+    <div class="header">
+        <div class="logo">DROPZONE</div>
 
-  <p id="result"></p>
+        <div class="stats">
+            <div class="stat">🪙 <span id="coins">0</span></div>
+            <div class="stat">⚡ <span id="xp">0</span> XP</div>
+        </div>
+    </div>
 
-  <script>
-    function play() {
-      const number = Math.floor(Math.random() * 6) + 1;
-      document.getElementById("result").textContent =
-        "🎲 The number is " + number;
+    <div class="card hero">
+
+        <div class="badge">🔥 DAILY DROP</div>
+
+        <h1 id="greeting">Ready?</h1>
+
+        <div class="subtitle">
+            Complete today's challenge.
+        </div>
+
+        <div class="streak">
+            🔥 Streak: <span id="streak">0</span> days
+        </div>
+
+    </div>
+
+    <div class="card" id="game">
+
+        <div class="section-title">
+            Today's Challenge
+        </div>
+
+        <div class="challenge" id="question">
+            Loading...
+        </div>
+
+        <div class="answers" id="answers"></div>
+
+    </div>
+
+    <div class="card hidden" id="result">
+
+        <div class="result">
+
+            <div class="big">🎉</div>
+
+            <h2>Challenge Complete!</h2>
+
+            <p id="resultText"></p>
+
+            <button class="primary" onclick="closeResult()">
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="section-title">
+            🏆 Leaderboard
+        </div>
+
+        <div id="leaderboard"></div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="section-title">
+            ⚡ Your Level
+        </div>
+
+        <div>
+            Level <b id="level">1</b>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="levelProgress"></div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        DROPZONE • Daily Mini-Challenges
+    </div>
+
+</div>
+
+<script>
+
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+// -------------------------
+// PLAYER DATA
+// -------------------------
+
+let player = JSON.parse(localStorage.getItem("dropzonePlayer")) || {
+    xp: 0,
+    coins: 0,
+    streak: 0,
+    lastPlayed: null
+};
+
+function savePlayer() {
+    localStorage.setItem(
+        "dropzonePlayer",
+        JSON.stringify(player)
+    );
+}
+
+// -------------------------
+// DAILY CHALLENGE
+// -------------------------
+
+const challenges = [
+
+    {
+        question: "Which planet is known as the Red Planet?",
+        answers: ["Venus", "Mars", "Jupiter", "Mercury"],
+        correct: 1
+    },
+
+    {
+        question: "What is 12 × 8?",
+        answers: ["86", "94", "96", "108"],
+        correct: 2
+    },
+
+    {
+        question: "Which language is mainly used to build web pages?",
+        answers: ["HTML", "Python", "C++", "SQL"],
+        correct: 0
+    },
+
+    {
+        question: "How many sides does a hexagon have?",
+        answers: ["5", "6", "7", "8"],
+        correct: 1
+    },
+
+    {
+        question: "Which ocean is the largest?",
+        answers: ["Atlantic", "Indian", "Arctic", "Pacific"],
+        correct: 3
+    },
+
+    {
+        question: "What color do you get by mixing blue and yellow?",
+        answers: ["Purple", "Green", "Orange", "Pink"],
+        correct: 1
+    },
+
+    {
+        question: "Which animal is known as the fastest land animal?",
+        answers: ["Lion", "Horse", "Cheetah", "Wolf"],
+        correct: 2
     }
-  </script>
+
+];
+
+// Pick challenge based on day
+const today = new Date();
+const dayNumber =
+    Math.floor(
+        today.getTime() / 86400000
+    );
+
+const challenge =
+    challenges[dayNumber % challenges.length];
+
+let completedToday =
+    localStorage.getItem("dropzoneCompleted") ===
+    today.toDateString();
+
+// -------------------------
+// UI
+// -------------------------
+
+function updateUI() {
+
+    document.getElementById("coins").textContent =
+        player.coins;
+
+    document.getElementById("xp").textContent =
+        player.xp;
+
+    document.getElementById("streak").textContent =
+        player.streak;
+
+    const level =
+        Math.floor(player.xp / 100) + 1;
+
+    document.getElementById("level").textContent =
+        level;
+
+    const progress =
+        player.xp % 100;
+
+    document.getElementById("levelProgress").style.width =
+        progress + "%";
+
+    const name =
+        tg?.initDataUnsafe?.user?.first_name;
+
+    document.getElementById("greeting").textContent =
+        name ? `Yo ${name} 👋` : "Ready?";
+
+}
+
+function loadChallenge() {
+
+    document.getElementById("question").textContent =
+        challenge.question;
+
+    const answers =
+        document.getElementById("answers");
+
+    answers.innerHTML = "";
+
+    challenge.answers.forEach(
+        (answer, index) => {
+
+            const button =
+                document.createElement("button");
+
+            button.className = "answer";
+            button.textContent = answer;
+
+            button.onclick =
+                () => answerQuestion(index, button);
+
+            answers.appendChild(button);
+        }
+    );
+
+    if (completedToday) {
+
+        document.getElementById("question").textContent =
+            "You already completed today's challenge! 🔥";
+
+        document.getElementById("answers").innerHTML =
+            "<div style='text-align:center;color:#999'>Come back tomorrow.</div>";
+
+    }
+
+}
+
+// -------------------------
+// ANSWER
+// -------------------------
+
+function answerQuestion(index, button) {
+
+    if (completedToday) return;
+
+    const buttons =
+        document.querySelectorAll(".answer");
+
+    buttons.forEach(
+        b => b.disabled = true
+    );
+
+    if (index === challenge.correct) {
+
+        button.classList.add("correct");
+
+        const xpReward = 50;
+        const coinReward = 25;
+
+        player.xp += xpReward;
+        player.coins += coinReward;
+
+        updateStreak();
+
+        document.getElementById("resultText").textContent =
+            `+${xpReward} XP  •  +${coinReward} Coins`;
+
+    } else {
+
+        button.classList.add("wrong");
+
+        buttons[
+            challenge.correct
+        ].classList.add("correct");
+
+        player.xp += 10;
+
+        document.getElementById("resultText").textContent =
+            "+10 XP — Better luck tomorrow!";
+
+    }
+
+    completedToday = true;
+
+    localStorage.setItem(
+        "dropzoneCompleted",
+        today.toDateString()
+    );
+
+    savePlayer();
+
+    setTimeout(() => {
+
+        document.getElementById("game")
+            .classList.add("hidden");
+
+        document.getElementById("result")
+            .classList.remove("hidden");
+
+        updateUI();
+
+    }, 700);
+
+}
+
+// -------------------------
+// STREAK
+// -------------------------
+
+function updateStreak() {
+
+    const todayString =
+        today.toDateString();
+
+    if (!player.lastPlayed) {
+
+        player.streak = 1;
+
+    } else {
+
+        const previous =
+            new Date(player.lastPlayed);
+
+        const difference =
+            Math.floor(
+                (today - previous) /
+                86400000
+            );
+
+        if (difference === 1) {
+
+            player.streak++;
+
+        } else if (difference > 1) {
+
+            player.streak = 1;
+
+        }
+
+    }
+
+    player.lastPlayed =
+        todayString;
+}
+
+// -------------------------
+// RESULT
+// -------------------------
+
+function closeResult() {
+
+    document.getElementById("result")
+        .classList.add("hidden");
+
+    document.getElementById("game")
+        .classList.remove("hidden");
+
+}
+
+// -------------------------
+// DEMO LEADERBOARD
+// -------------------------
+
+function loadLeaderboard() {
+
+    const fakePlayers = [
+
+        ["Shadow", 1250],
+        ["Nova", 980],
+        ["Pixel", 760],
+        ["Rex", 540],
+        ["You", player.xp]
+
+    ];
+
+    fakePlayers.sort(
+        (a,b) => b[1] - a[1]
+    );
+
+    const leaderboard =
+        document.getElementById("leaderboard");
+
+    leaderboard.innerHTML = "";
+
+    fakePlayers.forEach(
+        (p, index) => {
+
+            const row =
+                document.createElement("div");
+
+            row.className = "rank";
+
+            row.innerHTML = `
+                <div class="position">
+                    #${index + 1}
+                </div>
+
+                <div class="player">
+                    ${p[0]}
+                </div>
+
+                <div class="xp">
+                    ${p[1]} XP
+                </div>
+            `;
+
+            leaderboard.appendChild(row);
+
+        }
+    );
+
+}
+
+// -------------------------
+// START
+// -------------------------
+
+updateUI();
+loadChallenge();
+loadLeaderboard();
+
+</script>
 
 </body>
 </html>
