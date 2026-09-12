@@ -274,7 +274,6 @@
 </style>
 
 <script>
-  // Konfiguration
   const BOT_TOKEN = "BOT_TOKEN";
   const SUPABASE_URL = "https://aljuzdtvqjlwgkpyvorg.supabase.co";
   const SUPABASE_ANON_KEY = "ANON_KEY";
@@ -324,9 +323,6 @@
 (function(){
 "use strict";
 
-/* =========================================================
-   0. TELEGRAM WEBAPP SETUP
-   ========================================================= */
 const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
 if (tg) {
   try { tg.ready(); tg.expand(); } catch(e){}
@@ -341,40 +337,18 @@ function getTelegramUser() {
   return { id: "guest", name: "Spieler", username: null };
 }
 
-/* =========================================================
-   1. DICTIONARIES & TRANSLATIONS
-   ========================================================= */
 const I18N = {
   de: {
-    navPlay: "Spielen",
-    navRanking: "Rangliste",
-    navProfile: "Profil",
-    defaultUser: "Spieler",
-    level: "Level",
-    dailyTitle: "🎯 Daily Challenge",
-    dailyBonusTitle: "Daily Bonus",
-    dailyBonusSub: "+50 XP · +50 Coins für alle 5 Challenges",
-    dailyBonusClaimed: "Heute bereits abgeholt",
-    claim: "Holen",
-    claimed: "Erhalten",
-    todaysChallenges: "Heutige Challenges",
-    streak: "Streak",
-    coins: "Coins",
-    badges: "Badges",
-    wrong: "Falsch!",
-    bonusToast: "🎁 Bonus: +50 XP · +50 🪙",
-    rankingTitle: "🏆 Rangliste",
-    rankingNote: "Live-Rangliste aller DROPZONE Spieler.",
-    you: "DU",
-    demo: "Demo",
-    myBadges: "Meine Badges",
-    playerStats: "Spielerstatistiken",
-    totalChallenges: "Gesamte Challenges",
-    correctAnswers: "Richtige Antworten",
-    wrongAnswers: "Falsche Antworten",
-    totalXP: "Gesamt-XP",
-    totalCoins: "Gesamt-Coins",
-    bestStreak: "Beste Streak",
+    navPlay: "Spielen", navRanking: "Rangliste", navProfile: "Profil",
+    defaultUser: "Spieler", level: "Level", dailyTitle: "🎯 Daily Challenge",
+    dailyBonusTitle: "Daily Bonus", dailyBonusSub: "+50 XP · +50 Coins für alle 5 Challenges",
+    dailyBonusClaimed: "Heute bereits abgeholt", claim: "Holen", claimed: "Erhalten",
+    todaysChallenges: "Heutige Challenges", streak: "Streak", coins: "Coins", badges: "Badges",
+    wrong: "Falsch!", bonusToast: "🎁 Bonus: +50 XP · +50 🪙", rankingTitle: "🏆 Rangliste",
+    rankingNote: "Live-Rangliste aller DROPZONE Spieler.", you: "DU", demo: "Demo",
+    myBadges: "Meine Badges", playerStats: "Spielerstatistiken", totalChallenges: "Gesamte Challenges",
+    correctAnswers: "Richtige Antworten", wrongAnswers: "Falsche Antworten", totalXP: "Gesamt-XP",
+    totalCoins: "Gesamt-Coins", bestStreak: "Beste Streak",
     categories: { wissen: "Wissen", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaktion", logik: "Logik" },
     badgeDefs: [
       { id:"first_drop", title:"First Drop", desc:"Erste Challenge abgeschlossen." },
@@ -386,35 +360,16 @@ const I18N = {
     ]
   },
   en: {
-    navPlay: "Play",
-    navRanking: "Ranking",
-    navProfile: "Profile",
-    defaultUser: "Player",
-    level: "Level",
-    dailyTitle: "🎯 Daily Challenge",
-    dailyBonusTitle: "Daily Bonus",
-    dailyBonusSub: "+50 XP · +50 Coins for all 5 challenges",
-    dailyBonusClaimed: "Already claimed today",
-    claim: "Claim",
-    claimed: "Claimed",
-    todaysChallenges: "Today's Challenges",
-    streak: "Streak",
-    coins: "Coins",
-    badges: "Badges",
-    wrong: "Wrong!",
-    bonusToast: "🎁 Bonus: +50 XP · +50 🪙",
-    rankingTitle: "🏆 Ranking",
-    rankingNote: "Live leaderboard of all DROPZONE players.",
-    you: "YOU",
-    demo: "Demo",
-    myBadges: "My Badges",
-    playerStats: "Player Stats",
-    totalChallenges: "Total Challenges",
-    correctAnswers: "Correct Answers",
-    wrongAnswers: "Wrong Answers",
-    totalXP: "Total XP",
-    totalCoins: "Total Coins",
-    bestStreak: "Best Streak",
+    navPlay: "Play", navRanking: "Ranking", navProfile: "Profile",
+    defaultUser: "Player", level: "Level", dailyTitle: "🎯 Daily Challenge",
+    dailyBonusTitle: "Daily Bonus", dailyBonusSub: "+50 XP · +50 Coins for all 5 challenges",
+    dailyBonusClaimed: "Already claimed today", claim: "Claim", claimed: "Claimed",
+    todaysChallenges: "Today's Challenges", streak: "Streak", coins: "Coins", badges: "Badges",
+    wrong: "Wrong!", bonusToast: "🎁 Bonus: +50 XP · +50 🪙", rankingTitle: "🏆 Ranking",
+    rankingNote: "Live leaderboard of all DROPZONE players.", you: "YOU", demo: "Demo",
+    myBadges: "My Badges", playerStats: "Player Stats", totalChallenges: "Total Challenges",
+    correctAnswers: "Correct Answers", wrongAnswers: "Wrong Answers", totalXP: "Total XP",
+    totalCoins: "Total Coins", bestStreak: "Best Streak",
     categories: { wissen: "Knowledge", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaction", logik: "Logic" },
     badgeDefs: [
       { id:"first_drop", title:"First Drop", desc:"Completed first challenge." },
@@ -426,35 +381,16 @@ const I18N = {
     ]
   },
   ru: {
-    navPlay: "Играть",
-    navRanking: "Рейтинг",
-    navProfile: "Профиль",
-    defaultUser: "Игрок",
-    level: "Уровень",
-    dailyTitle: "🎯 Ежедневный Челлендж",
-    dailyBonusTitle: "Ежедневный Бонус",
-    dailyBonusSub: "+50 XP · +50 Монет за все 5 заданий",
-    dailyBonusClaimed: "Уже получено сегодня",
-    claim: "Забрать",
-    claimed: "Получено",
-    todaysChallenges: "Задания на сегодня",
-    streak: "Серия",
-    coins: "Монеты",
-    badges: "Значки",
-    wrong: "Неверно!",
-    bonusToast: "🎁 Бонус: +50 XP · +50 🪙",
-    rankingTitle: "🏆 Таблица лидеров",
-    rankingNote: "Живой рейтинг всех игроков DROPZONE.",
-    you: "ВЫ",
-    demo: "Демо",
-    myBadges: "Мои Значки",
-    playerStats: "Статистика",
-    totalChallenges: "Всего челленджей",
-    correctAnswers: "Правильных ответов",
-    wrongAnswers: "Неправильных ответов",
-    totalXP: "Всего XP",
-    totalCoins: "Всего монет",
-    bestStreak: "Лучшая серия",
+    navPlay: "Играть", navRanking: "Рейтинг", navProfile: "Профиль",
+    defaultUser: "Игрок", level: "Уровень", dailyTitle: "🎯 Ежедневный Челлендж",
+    dailyBonusTitle: "Ежедневный Бонус", dailyBonusSub: "+50 XP · +50 Монет за все 5 заданий",
+    dailyBonusClaimed: "Уже получено сегодня", claim: "Забрать", claimed: "Получено",
+    todaysChallenges: "Задания на сегодня", streak: "Серия", coins: "Монеты", badges: "Значки",
+    wrong: "Неверно!", bonusToast: "🎁 Бонус: +50 XP · +50 🪙", rankingTitle: "🏆 Таблица лидеров",
+    rankingNote: "Живой рейтинг всех игроков DROPZONE.", you: "ВЫ", demo: "Демо",
+    myBadges: "Мои Значки", playerStats: "Статистика", totalChallenges: "Всего челленджей",
+    correctAnswers: "Правильных ответов", wrongAnswers: "Неправильных ответов", totalXP: "Всего XP",
+    totalCoins: "Всего монет", bestStreak: "Лучшая серия",
     categories: { wissen: "Знания", gaming: "Игры", facts: "Факты", reaktion: "Реакция", logik: "Логика" },
     badgeDefs: [
       { id:"first_drop", title:"Первый шаг", desc:"Завершите первый челлендж." },
@@ -467,9 +403,30 @@ const I18N = {
   }
 };
 
-/* =========================================================
-   2. STORAGE KEYS & HELPERS
-   ========================================================= */
+const EMBEDDED_QUESTIONS = {
+  de: {
+    wissen: [{ q:"Wie viele Kontinente gibt es?", a:["5","6","7","8"], c:2 }],
+    gaming: [{ q:"Welche Plattform gehört zu Valve?", a:["Steam","Epic Games","Roblox","Discord"], c:0 }],
+    facts: [{ q:"Wie viele Herzen hat ein Oktopus?", a:["1","2","3","4"], c:2 }],
+    reaktion: [{ q:"Welche Ampelfarbe bedeutet 'Stopp'?", a:["Grün","Gelb","Rot","Blau"], c:2 }],
+    logik: [{ q:"Was folgt in der Reihe: 2, 4, 8, 16, ?", a:["18","24","32","20"], c:2 }]
+  },
+  en: {
+    wissen: [{ q:"How many continents are there on Earth?", a:["5","6","7","8"], c:2 }],
+    gaming: [{ q:"Which platform belongs to Valve?", a:["Steam","Epic Games","Roblox","Discord"], c:0 }],
+    facts: [{ q:"How many hearts does an octopus have?", a:["1","2","3","4"], c:2 }],
+    reaktion: [{ q:"Which traffic light color means 'Stop'?", a:["Green","Yellow","Red","Blue"], c:2 }],
+    logik: [{ q:"What comes next: 2, 4, 8, 16, ?", a:["18","24","32","20"], c:2 }]
+  },
+  ru: {
+    wissen: [{ q:"Сколько континентов на Земле?", a:["5","6","7","8"], c:2 }],
+    gaming: [{ q:"Какая платформа принадлежит Valve?", a:["Steam","Epic Games","Roblox","Discord"], c:0 }],
+    facts: [{ q:"Сколько сердец у осьминога?", a:["1","2","3","4"], c:2 }],
+    reaktion: [{ q:"Какой цвет светофора означает 'Стоп'?", a:["Зеленый","Желтый","Красный","Синий"], c:2 }],
+    logik: [{ q:"Продолжите ряд: 2, 4, 8, 16, ?", a:["18","24","32","20"], c:2 }]
+  }
+};
+
 const LS_PLAYER = "dropzonePlayer";
 const LS_DAILY  = "dropzoneDaily";
 const LS_BADGES = "dropzoneBadges";
@@ -484,7 +441,6 @@ function loadJSON(key, fallback){
     return parsed == null ? fallback : parsed;
   }catch(e){ return fallback; }
 }
-   
 function saveJSON(key, val){
   try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
 }
@@ -509,9 +465,6 @@ function seededIndex(seedStr, arrLen){
   return arrLen > 0 ? h % arrLen : 0;
 }
 
-/* =========================================================
-   3. CATEGORIES & FALLBACK QUESTIONS
-   ========================================================= */
 const CATEGORY_KEYS = [
   { key:"wissen",   icon:"🧠", xp:20, coins:10 },
   { key:"gaming",   icon:"🎮", xp:20, coins:10 },
@@ -520,20 +473,8 @@ const CATEGORY_KEYS = [
   { key:"logik",    icon:"🧩", xp:30, coins:20 }
 ];
 
-const FALLBACK_QUESTIONS = {
-  wissen: [{ q:"Wie viele Kontinente gibt es?", a:["5","6","7","8"], c:2 }],
-  gaming: [{ q:"Welche Plattform gehört zu Valve?", a:["Steam","Epic Games","Roblox","Discord"], c:0 }],
-  facts: [{ q:"Wie viele Herzen hat ein Oktopus?", a:["1","2","3","4"], c:2 }],
-  reaktion: [{ q:"Welche Ampelfarbe bedeutet 'Stopp'?", a:["Grün","Gelb","Rot","Blau"], c:2 }],
-  logik: [{ q:"Was folgt in der Reihe: 2, 4, 8, 16, ?", a:["18","24","32","20"], c:2 }]
-};
-
 let currentLang = localStorage.getItem(LS_LANG) || "de";
-let currentQuestionBank = FALLBACK_QUESTIONS;
 
-/* =========================================================
-   4. BADGES & STATE
-   ========================================================= */
 const BADGE_ICONS = {
   first_drop: "🏅", streak7: "🔥", quiz_master: "🧠",
   perfect_day: "⚡", veteran: "🏆", coin_collector: "💰"
@@ -561,8 +502,10 @@ function defaultBadges(){ return { unlocked:[] }; }
 
 function generateDailyChallenges(dateStr){
   const langText = I18N[currentLang] || I18N.de;
+  const questions = EMBEDDED_QUESTIONS[currentLang] || EMBEDDED_QUESTIONS.de;
+
   return CATEGORY_KEYS.map(cat=>{
-    const bank = currentQuestionBank[cat.key] || FALLBACK_QUESTIONS[cat.key] || FALLBACK_QUESTIONS.wissen;
+    const bank = questions[cat.key] || EMBEDDED_QUESTIONS.de[cat.key];
     const idx = seededIndex(dateStr + "_" + cat.key, bank.length);
     const item = bank[idx] || bank[0];
     return {
@@ -580,18 +523,8 @@ function generateDailyChallenges(dateStr){
   });
 }
 
-async function loadLanguageQuestions(langCode){
-  try {
-    const res = await fetch(`questions/${langCode}.json`);
-    if (res.ok) {
-      currentQuestionBank = await res.json();
-    } else {
-      currentQuestionBank = FALLBACK_QUESTIONS;
-    }
-  } catch(e) {
-    currentQuestionBank = FALLBACK_QUESTIONS;
-  }
-
+function updateLanguage(langCode){
+  currentLang = langCode;
   const today = todayStr();
   const langText = I18N[langCode] || I18N.de;
 
@@ -644,9 +577,6 @@ function saveAll(){
   savePlayerToSupabase();
 }
 
-/* =========================================================
-   4. LEVEL & GAME ACTIONS
-   ========================================================= */
 function getLevel(xp){ return Math.floor(xp/100) + 1; }
 function levelFloor(level){ return (level-1)*100; }
 function levelCeil(level){ return level*100; }
@@ -726,9 +656,6 @@ function getRankingData(){
   return all;
 }
 
-/* =========================================================
-   5. RENDERING
-   ========================================================= */
 let openChallengeIndex = null;
 
 function el(html){
@@ -938,9 +865,6 @@ function renderAll(){
   renderProfile();
 }
 
-/* =========================================================
-   6. NAVIGATION, SUPABASE & INIT
-   ========================================================= */
 function switchView(name){
   ["play","ranking","profile"].forEach(v=>{
     document.getElementById("view-"+v).hidden = (v !== name);
@@ -987,12 +911,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (langSelect) {
     langSelect.value = currentLang;
     langSelect.addEventListener("change", (e) => {
-      currentLang = e.target.value;
-      loadLanguageQuestions(currentLang);
+      updateLanguage(e.target.value);
     });
   }
 
-  loadLanguageQuestions(currentLang);
+  updateLanguage(currentLang);
 });
 
 })();
