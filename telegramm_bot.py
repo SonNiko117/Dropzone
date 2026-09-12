@@ -35,6 +35,20 @@ NEWS_CHANNEL_URL = "https://t.me/DropzoneGameNews"
 
 
 # =========================
+# /START
+# =========================
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    await update.message.reply_text(
+        "Welcome to DROPZONE! 👋\n\n"
+        "We hope you have a lot of fun playing our game.\n"
+        "Use the command /Game to enter the game!\n\n"
+        "Have fun! 🔥"
+    )
+
+
+# =========================
 # /GAME
 # =========================
 
@@ -192,8 +206,12 @@ async def successful_payment(
 
 async def post_init(app):
 
-    # Set ONLY these commands
+    # Commands shown in the Telegram command menu
     await app.bot.set_my_commands([
+        BotCommand(
+            "start",
+            "👋 Welcome to DROPZONE"
+        ),
         BotCommand(
             "game",
             "🎮 DROPZONE Game"
@@ -208,7 +226,7 @@ async def post_init(app):
         ),
     ])
 
-    # Reset the Menu button to the normal command menu
+    # Normal command menu button
     await app.bot.set_chat_menu_button(
         menu_button=MenuButtonCommands()
     )
@@ -233,6 +251,10 @@ def main():
     )
 
     # Commands
+    app.add_handler(
+        CommandHandler("start", start)
+    )
+
     app.add_handler(
         CommandHandler("game", game)
     )
