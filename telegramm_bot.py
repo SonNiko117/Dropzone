@@ -9,6 +9,7 @@ from telegram import (
     BotCommand,
     MenuButtonCommands,
 )
+
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -20,12 +21,16 @@ from telegram.ext import (
 )
 
 
+# =========================
+# CONFIG
+# =========================
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# Your DROPZONE Mini App URL
+# DROPZONE Mini App
 GAME_URL = "https://sonniko117.github.io/Dropzone/"
 
-# Your DROPZONE News Channel
+# DROPZONE News Channel
 NEWS_CHANNEL_URL = "https://t.me/DropzoneGameNews"
 
 
@@ -34,6 +39,7 @@ NEWS_CHANNEL_URL = "https://t.me/DropzoneGameNews"
 # =========================
 
 async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     keyboard = [
         [
             InlineKeyboardButton(
@@ -55,6 +61,7 @@ async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # =========================
 
 async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     keyboard = [
         [
             InlineKeyboardButton(
@@ -76,18 +83,37 @@ async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # =========================
 
 async def donate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     keyboard = [
         [
-            InlineKeyboardButton("⭐ 10 Stars", callback_data="donate_10"),
-            InlineKeyboardButton("⭐ 50 Stars", callback_data="donate_50"),
+            InlineKeyboardButton(
+                "⭐ 10 Stars",
+                callback_data="donate_10"
+            ),
+            InlineKeyboardButton(
+                "⭐ 50 Stars",
+                callback_data="donate_50"
+            ),
         ],
         [
-            InlineKeyboardButton("⭐ 100 Stars", callback_data="donate_100"),
-            InlineKeyboardButton("⭐ 250 Stars", callback_data="donate_250"),
+            InlineKeyboardButton(
+                "⭐ 100 Stars",
+                callback_data="donate_100"
+            ),
+            InlineKeyboardButton(
+                "⭐ 250 Stars",
+                callback_data="donate_250"
+            ),
         ],
         [
-            InlineKeyboardButton("⭐ 500 Stars", callback_data="donate_500"),
-            InlineKeyboardButton("⭐ 1000 Stars", callback_data="donate_1000"),
+            InlineKeyboardButton(
+                "⭐ 500 Stars",
+                callback_data="donate_500"
+            ),
+            InlineKeyboardButton(
+                "⭐ 1000 Stars",
+                callback_data="donate_1000"
+            ),
         ],
     ]
 
@@ -108,7 +134,9 @@ async def donation_selected(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
+
     query = update.callback_query
+
     await query.answer()
 
     amount = int(query.data.split("_")[1])
@@ -136,6 +164,7 @@ async def pre_checkout(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
+
     await update.pre_checkout_query.answer(ok=True)
 
 
@@ -147,6 +176,7 @@ async def successful_payment(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
+
     payment = update.message.successful_payment
 
     await update.message.reply_text(
@@ -157,19 +187,65 @@ async def successful_payment(
 
 
 # =========================
+# TELEGRAM SETTINGS
+# =========================
+
+async def post_init(app):
+
+    # Set ONLY these commands
+    await app.bot.set_my_commands([
+        BotCommand(
+            "game",
+            "🎮 DROPZONE Game"
+        ),
+        BotCommand(
+            "news",
+            "📰 DROPZONE News"
+        ),
+        BotCommand(
+            "donate",
+            "❤️ Support DROPZONE"
+        ),
+    ])
+
+    # Reset the Menu button to the normal command menu
+    await app.bot.set_chat_menu_button(
+        menu_button=MenuButtonCommands()
+    )
+
+
+# =========================
 # START BOT
 # =========================
 
 def main():
+
     if not BOT_TOKEN:
-        raise RuntimeError("BOT_TOKEN is not configured!")
+        raise RuntimeError(
+            "BOT_TOKEN is not configured!"
+        )
 
-    app = Application.builder().token(BOT_TOKEN).build()
+    app = (
+        Application.builder()
+        .token(BOT_TOKEN)
+        .post_init(post_init)
+        .build()
+    )
 
-    app.add_handler(CommandHandler("game", game))
-    app.add_handler(CommandHandler("news", news))
-    app.add_handler(CommandHandler("donate", donate))
+    # Commands
+    app.add_handler(
+        CommandHandler("game", game)
+    )
 
+    app.add_handler(
+        CommandHandler("news", news)
+    )
+
+    app.add_handler(
+        CommandHandler("donate", donate)
+    )
+
+    # Donation buttons
     app.add_handler(
         CallbackQueryHandler(
             donation_selected,
@@ -177,10 +253,12 @@ def main():
         )
     )
 
+    # Telegram Stars checkout
     app.add_handler(
         PreCheckoutQueryHandler(pre_checkout)
     )
 
+    # Successful payments
     app.add_handler(
         MessageHandler(
             filters.SUCCESSFUL_PAYMENT,
@@ -192,6 +270,10 @@ def main():
 
     app.run_polling()
 
+
+# =========================
+# RUN
+# =========================
 
 if __name__ == "__main__":
     main()
