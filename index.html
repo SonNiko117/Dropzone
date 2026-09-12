@@ -294,10 +294,12 @@
 
 <!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Lösche oder ersetze diesen doppelten Block in Zeile 297: -->
 <script>
   const SUPABASE_URL = "https://aljuzdtvqjlwgkpyvorg.supabase.co";
-  const SUPABASE_ANON_KEY = "ANON_KEY"; // <- Hier deinen Key einfügen
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_ANON_KEY = "ANON_KEY";
+  // WICHTIG: Nutze 'window.supabase' statt 'const supabase', um eine Doppel-Deklaration zu vermeiden:
+  window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 </head>
 <body>
