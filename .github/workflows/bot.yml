@@ -25,4 +25,4 @@ jobs:
       - name: Start DROPZONE Bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: python telegram_bot.py
+        run: python telegramm_bot.py
