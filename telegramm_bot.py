@@ -6,6 +6,8 @@ from telegram import (
     LabeledPrice,
     Update,
     WebAppInfo,
+    BotCommand,
+    MenuButtonCommands,
 )
 from telegram.ext import (
     Application,
