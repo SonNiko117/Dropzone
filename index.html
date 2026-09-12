@@ -290,6 +290,15 @@
   @keyframes toastIn{ from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
   @keyframes toastOut{ from{opacity:1;} to{opacity:0; transform:translateY(-8px);} }
 </style>
+
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://aljuzdtvqjlwgkpyvorg.supabase.co";
+  const SUPABASE_ANON_KEY = "ANON_KEY"; // <- Hier deinen Key einfügen
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 </head>
 <body>
 
@@ -963,7 +972,47 @@ function switchView(name){
 document.querySelectorAll(".nav-btn").forEach(btn=>{
   btn.addEventListener("click", ()=> switchView(btn.dataset.view));
 });
+  // --- Supabase-Funktionen ---
+async function savePlayerToSupabase() {
+ if (!supabase) return;
+  
+  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  const userId = tgUser ? String(tgUser.id) : (localStorage.getItem('guest_id') || 'guest_' + Math.random().toString(36).substring(2, 11));
+  
+  if (!tgUser && !localStorage.getItem('guest_id')) {
+    localStorage.setItem('guest_id', userId);
+  }
 
+  const playerData = {
+    id: userId,
+    name: tgUser ? tgUser.first_name : (player.name || "Gast"),
+    username: tgUser?.username || null,
+    xp: player.xp,
+    coins: player.coins,
+    streak: player.streak,
+    best_streak: player.bestStreak,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase.from('players').upsert(playerData);
+  if (error) console.error("Supabase Save Error:", error);
+}
+
+async function loadLeaderboard() {
+ if (!supabase) return;
+
+  const { data, error } = await supabase.from('players')
+    .select('id, name, xp, coins')
+    .order('xp', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error("Leaderboard Error:", error);
+    return [];
+  }
+  
+  return data;
+}
 document.addEventListener("DOMContentLoaded", () => {
   loadState();
 
