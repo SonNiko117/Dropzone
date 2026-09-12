@@ -321,9 +321,9 @@
 
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
-    <button class="nav-btn active" data-view="play"><span class="nav-icon">🎯</span>Play</button>
-    <button class="nav-btn" data-view="ranking"><span class="nav-icon">🏆</span>Ranking</button>
-    <button class="nav-btn" data-view="profile"><span class="nav-icon">👤</span>Profile</button>
+    <button class="nav-btn active" data-view="play"><span class="nav-icon">🎯</span><span id="nav-label-play">Spielen</span></button>
+    <button class="nav-btn" data-view="ranking"><span class="nav-icon">🏆</span><span id="nav-label-ranking">Rangliste</span></button>
+    <button class="nav-btn" data-view="profile"><span class="nav-icon">👤</span><span id="nav-label-profile">Profil</span></button>
   </div>
 </div>
 
@@ -353,7 +353,133 @@ function getTelegramUser(){
 }
 
 /* =========================================================
-   1. STORAGE KEYS & HELPERS
+   1. DICTIONARIES & TRANSLATIONS
+   ========================================================= */
+const I18N = {
+  de: {
+    navPlay: "Spielen",
+    navRanking: "Rangliste",
+    navProfile: "Profil",
+    defaultUser: "Spieler",
+    level: "Level",
+    dailyTitle: "🎯 Daily Challenge",
+    dailyBonusTitle: "Daily Bonus",
+    dailyBonusSub: "+50 XP · +50 Coins für alle 5 Challenges",
+    dailyBonusClaimed: "Heute bereits abgeholt",
+    claim: "Holen",
+    claimed: "Erhalten",
+    todaysChallenges: "Heutige Challenges",
+    streak: "Streak",
+    coins: "Coins",
+    badges: "Badges",
+    wrong: "Falsch!",
+    bonusToast: "🎁 Bonus: +50 XP · +50 🪙",
+    rankingTitle: "🏆 Rangliste",
+    rankingNote: "Hinweis: Außer dir sind dies Demo-Spieler — es gibt noch kein Live-Backend.",
+    you: "DU",
+    demo: "Demo",
+    myBadges: "Meine Badges",
+    playerStats: "Spielerstatistiken",
+    totalChallenges: "Gesamte Challenges",
+    correctAnswers: "Richtige Antworten",
+    wrongAnswers: "Falsche Antworten",
+    totalXP: "Gesamt-XP",
+    totalCoins: "Gesamt-Coins",
+    bestStreak: "Beste Streak",
+    categories: { wissen: "Wissen", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaktion", logik: "Logik" },
+    badgeDefs: [
+      { id:"first_drop", title:"First Drop", desc:"Erste Challenge abgeschlossen." },
+      { id:"streak7", title:"7 Day Streak", desc:"7 Tage hintereinander gespielt." },
+      { id:"quiz_master", title:"Quiz Master", desc:"50 Challenges abgeschlossen." },
+      { id:"perfect_day", title:"Perfect Day", desc:"Alle 5 Daily Challenges an einem Tag." },
+      { id:"veteran", title:"Veteran", desc:"100 Challenges abgeschlossen." },
+      { id:"coin_collector", title:"Coin Collector", desc:"1000 Coins gesammelt." }
+    ]
+  },
+  en: {
+    navPlay: "Play",
+    navRanking: "Ranking",
+    navProfile: "Profile",
+    defaultUser: "Player",
+    level: "Level",
+    dailyTitle: "🎯 Daily Challenge",
+    dailyBonusTitle: "Daily Bonus",
+    dailyBonusSub: "+50 XP · +50 Coins for all 5 challenges",
+    dailyBonusClaimed: "Already claimed today",
+    claim: "Claim",
+    claimed: "Claimed",
+    todaysChallenges: "Today's Challenges",
+    streak: "Streak",
+    coins: "Coins",
+    badges: "Badges",
+    wrong: "Wrong!",
+    bonusToast: "🎁 Bonus: +50 XP · +50 🪙",
+    rankingTitle: "🏆 Ranking",
+    rankingNote: "Note: Except for you, these are demo players — no live backend yet.",
+    you: "YOU",
+    demo: "Demo",
+    myBadges: "My Badges",
+    playerStats: "Player Stats",
+    totalChallenges: "Total Challenges",
+    correctAnswers: "Correct Answers",
+    wrongAnswers: "Wrong Answers",
+    totalXP: "Total XP",
+    totalCoins: "Total Coins",
+    bestStreak: "Best Streak",
+    categories: { wissen: "Knowledge", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaction", logik: "Logic" },
+    badgeDefs: [
+      { id:"first_drop", title:"First Drop", desc:"Completed first challenge." },
+      { id:"streak7", title:"7 Day Streak", desc:"Played 7 days in a row." },
+      { id:"quiz_master", title:"Quiz Master", desc:"Completed 50 challenges." },
+      { id:"perfect_day", title:"Perfect Day", desc:"All 5 daily challenges in one day." },
+      { id:"veteran", title:"Veteran", desc:"Completed 100 challenges." },
+      { id:"coin_collector", title:"Coin Collector", desc:"Collected 1000 coins." }
+    ]
+  },
+  ru: {
+    navPlay: "Играть",
+    navRanking: "Рейтинг",
+    navProfile: "Профиль",
+    defaultUser: "Игрок",
+    level: "Уровень",
+    dailyTitle: "🎯 Ежедневный Челлендж",
+    dailyBonusTitle: "Ежедневный Бонус",
+    dailyBonusSub: "+50 XP · +50 Монет за все 5 заданий",
+    dailyBonusClaimed: "Уже получено сегодня",
+    claim: "Забрать",
+    claimed: "Получено",
+    todaysChallenges: "Задания на сегодня",
+    streak: "Серия",
+    coins: "Монеты",
+    badges: "Значки",
+    wrong: "Неверно!",
+    bonusToast: "🎁 Бонус: +50 XP · +50 🪙",
+    rankingTitle: "🏆 Таблица лидеров",
+    rankingNote: "Примечание: Кроме вас, это демо-игроки — бэкенд пока не подключен.",
+    you: "ВЫ",
+    demo: "Демо",
+    myBadges: "Мои Значки",
+    playerStats: "Статистика",
+    totalChallenges: "Всего челленджей",
+    correctAnswers: "Правильных ответов",
+    wrongAnswers: "Неправильных ответов",
+    totalXP: "Всего XP",
+    totalCoins: "Всего монет",
+    bestStreak: "Лучшая серия",
+    categories: { wissen: "Знания", gaming: "Игры", facts: "Факты", reaktion: "Реакция", logik: "Логика" },
+    badgeDefs: [
+      { id:"first_drop", title:"Первый шаг", desc:"Завершите первый челлендж." },
+      { id:"streak7", title:"Серия 7 дней", desc:"Играйте 7 дней подряд." },
+      { id:"quiz_master", title:"Мастер викторин", desc:"Завершите 50 челленджей." },
+      { id:"perfect_day", title:"Идеальный день", desc:"Все 5 заданий за один день." },
+      { id:"veteran", title:"Ветеран", desc:"Завершите 100 челленджей." },
+      { id:"coin_collector", title:"Сборщик монет", desc:"Соберите 1000 монет." }
+    ]
+  }
+};
+
+/* =========================================================
+   2. STORAGE KEYS & HELPERS
    ========================================================= */
 const LS_PLAYER = "dropzonePlayer";
 const LS_DAILY  = "dropzoneDaily";
@@ -394,14 +520,14 @@ function seededIndex(seedStr, arrLen){
 }
 
 /* =========================================================
-   2. CATEGORIES & FALLBACK QUESTIONS
+   3. CATEGORIES & FALLBACK QUESTIONS
    ========================================================= */
-const CATEGORIES = [
-  { key:"wissen",   label:"Wissen",        icon:"🧠", xp:20, coins:10 },
-  { key:"gaming",   label:"Gaming",        icon:"🎮", xp:20, coins:10 },
-  { key:"facts",    label:"Random Facts",  icon:"🌍", xp:25, coins:15 },
-  { key:"reaktion", label:"Reaktion",      icon:"⚡", xp:25, coins:15 },
-  { key:"logik",    label:"Logik",         icon:"🧩", xp:30, coins:20 }
+const CATEGORY_KEYS = [
+  { key:"wissen",   icon:"🧠", xp:20, coins:10 },
+  { key:"gaming",   icon:"🎮", xp:20, coins:10 },
+  { key:"facts",    icon:"🌍", xp:25, coins:15 },
+  { key:"reaktion", icon:"⚡", xp:25, coins:15 },
+  { key:"logik",    icon:"🧩", xp:30, coins:20 }
 ];
 
 const FALLBACK_QUESTIONS = {
@@ -416,16 +542,21 @@ let currentLang = localStorage.getItem(LS_LANG) || "de";
 let currentQuestionBank = FALLBACK_QUESTIONS;
 
 /* =========================================================
-   3. BADGES & STATE
+   4. BADGES & STATE
    ========================================================= */
-const BADGE_DEFS = [
-  { id:"first_drop",   icon:"🏅", title:"First Drop",    desc:"Erste Challenge abgeschlossen.", check:(s)=> s.totalChallenges >= 1 },
-  { id:"streak7",       icon:"🔥", title:"7 Day Streak",  desc:"7 Tage hintereinander gespielt.", check:(s)=> s.bestStreak >= 7 },
-  { id:"quiz_master",   icon:"🧠", title:"Quiz Master",   desc:"50 Challenges abgeschlossen.", check:(s)=> s.totalChallenges >= 50 },
-  { id:"perfect_day",   icon:"⚡", title:"Perfect Day",   desc:"Alle 5 Daily Challenges an einem Tag.", check:(s)=> s.perfectDays >= 1 },
-  { id:"veteran",       icon:"🏆", title:"Veteran",       desc:"100 Challenges abgeschlossen.", check:(s)=> s.totalChallenges >= 100 },
-  { id:"coin_collector",icon:"💰", title:"Coin Collector",desc:"1000 Coins gesammelt.", check:(s)=> s.totalCoinsEarned >= 1000 }
-];
+const BADGE_ICONS = {
+  first_drop: "🏅", streak7: "🔥", quiz_master: "🧠",
+  perfect_day: "⚡", veteran: "🏆", coin_collector: "💰"
+};
+
+const BADGE_CHECKS = {
+  first_drop: (s)=> s.totalChallenges >= 1,
+  streak7: (s)=> s.bestStreak >= 7,
+  quiz_master: (s)=> s.totalChallenges >= 50,
+  perfect_day: (s)=> s.perfectDays >= 1,
+  veteran: (s)=> s.totalChallenges >= 100,
+  coin_collector: (s)=> s.totalCoinsEarned >= 1000
+};
 
 let player, daily, badges, stats;
 
@@ -439,13 +570,14 @@ function defaultStats(){
 function defaultBadges(){ return { unlocked:[] }; }
 
 function generateDailyChallenges(dateStr){
-  return CATEGORIES.map(cat=>{
+  const langText = I18N[currentLang] || I18N.de;
+  return CATEGORY_KEYS.map(cat=>{
     const bank = currentQuestionBank[cat.key] || FALLBACK_QUESTIONS[cat.key] || FALLBACK_QUESTIONS.wissen;
     const idx = seededIndex(dateStr + "_" + cat.key, bank.length);
     const item = bank[idx] || bank[0];
     return {
       category: cat.key,
-      catLabel: cat.label,
+      catLabel: langText.categories[cat.key] || cat.key,
       catIcon: cat.icon,
       question: item.q,
       answers: item.a,
@@ -471,12 +603,14 @@ async function loadLanguageQuestions(langCode){
   }
 
   const today = todayStr();
+  const langText = I18N[langCode] || I18N.de;
+
   if (!daily || daily.date !== today) {
     daily = { date: today, challenges: generateDailyChallenges(today), bonusClaimed:false };
   } else {
-    // Wenn am selben Tag die Sprache gewechselt wird: Texte der nicht gelösten Aufgaben updaten
     const fresh = generateDailyChallenges(today);
     daily.challenges.forEach((ch, i) => {
+      ch.catLabel = langText.categories[ch.category] || ch.category;
       if (!ch.completed && fresh[i]) {
         ch.question = fresh[i].question;
         ch.answers = fresh[i].answers;
@@ -527,6 +661,7 @@ function levelFloor(level){ return (level-1)*100; }
 function levelCeil(level){ return level*100; }
 
 function answerChallenge(index, answerIdx){
+  const langText = I18N[currentLang] || I18N.de;
   const ch = daily.challenges[index];
   if (!ch || ch.completed) return;
 
@@ -545,7 +680,7 @@ function answerChallenge(index, answerIdx){
     showToast("+" + ch.xp + " XP · +" + ch.coins + " 🪙");
   } else {
     stats.wrongAnswers += 1;
-    showToast("Falsch!");
+    showToast(langText.wrong);
   }
 
   const today = todayStr();
@@ -562,6 +697,7 @@ function answerChallenge(index, answerIdx){
 }
 
 function claimDailyBonus(){
+  const langText = I18N[currentLang] || I18N.de;
   if (daily.bonusClaimed) return;
   const allDone = daily.challenges.every(c=>c.completed);
   if (!allDone) return;
@@ -573,14 +709,14 @@ function claimDailyBonus(){
   daily.bonusClaimed = true;
   updateBadges();
   saveAll();
-  showToast("🎁 Bonus: +50 XP · +50 🪙");
+  showToast(langText.bonusToast);
   renderAll();
 }
 
 function updateBadges(){
-  BADGE_DEFS.forEach(b=>{
-    if (!badges.unlocked.includes(b.id) && b.check(stats)) {
-      badges.unlocked.push(b.id);
+  Object.keys(BADGE_CHECKS).forEach(id=>{
+    if (!badges.unlocked.includes(id) && BADGE_CHECKS[id](stats)) {
+      badges.unlocked.push(id);
     }
   });
 }
@@ -592,7 +728,8 @@ function getRankingData(){
     { name:"Pixel",  level:11, xp:1050, demo:true },
     { name:"Rex",    level:9,  xp:890,  demo:true }
   ];
-  const me = { name: player.name || "Du", level:getLevel(player.xp), xp:player.xp, demo:false, isMe:true };
+  const langText = I18N[currentLang] || I18N.de;
+  const me = { name: player.name || langText.defaultUser, level:getLevel(player.xp), xp:player.xp, demo:false, isMe:true };
   const all = demoPlayers.concat([me]);
   all.sort((a,b)=> b.xp - a.xp);
   return all;
@@ -622,16 +759,22 @@ function showToast(msg){
 }
 
 function renderTopbar(){
+  const langText = I18N[currentLang] || I18N.de;
   document.getElementById("topbar-avatar").textContent = initials(player.name);
-  document.getElementById("topbar-name").textContent = player.name || "Spieler";
-  document.getElementById("topbar-sub").textContent = "Level " + getLevel(player.xp);
+  document.getElementById("topbar-name").textContent = player.name || langText.defaultUser;
+  document.getElementById("topbar-sub").textContent = langText.level + " " + getLevel(player.xp);
   document.getElementById("topbar-coins").textContent = player.coins;
   
   const langSelect = document.getElementById("lang-select");
   if (langSelect) langSelect.value = currentLang;
+
+  document.getElementById("nav-label-play").textContent = langText.navPlay;
+  document.getElementById("nav-label-ranking").textContent = langText.navRanking;
+  document.getElementById("nav-label-profile").textContent = langText.navProfile;
 }
 
 function renderPlay(){
+  const langText = I18N[currentLang] || I18N.de;
   const root = document.getElementById("view-play");
   const completedCount = daily.challenges.filter(c=>c.completed).length;
   const pct = Math.round((completedCount/5)*100);
@@ -640,7 +783,7 @@ function renderPlay(){
   let html = `
     <div class="daily-card">
       <div class="daily-card-top">
-        <div class="daily-card-title">🎯 Daily Challenge</div>
+        <div class="daily-card-title">${langText.dailyTitle}</div>
         <div class="daily-card-count">${completedCount} / 5</div>
       </div>
       <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -649,21 +792,21 @@ function renderPlay(){
     <div class="bonus-card ${daily.bonusClaimed ? 'claimed':''}">
       <div class="bonus-icon">🎁</div>
       <div class="bonus-texts">
-        <div class="bonus-title">Daily Bonus</div>
-        <div class="bonus-sub">${daily.bonusClaimed ? 'Heute bereits abgeholt' : '+50 XP · +50 Coins für alle 5 Challenges'}</div>
+        <div class="bonus-title">${langText.dailyBonusTitle}</div>
+        <div class="bonus-sub">${daily.bonusClaimed ? langText.dailyBonusClaimed : langText.dailyBonusSub}</div>
       </div>
       <button class="bonus-btn" id="bonus-btn" ${(!allDone || daily.bonusClaimed) ? 'disabled':''}>
-        ${daily.bonusClaimed ? 'Erhalten' : 'Holen'}
+        ${daily.bonusClaimed ? langText.claimed : langText.claim}
       </button>
     </div>
 
-    <div class="section-title">Heutige Challenges</div>
+    <div class="section-title">${langText.todaysChallenges}</div>
     <div id="challenge-list"></div>
 
     <div class="mini-stats">
-      <div class="mini-stat"><div class="mini-stat-val">🔥 ${player.streak}</div><div class="mini-stat-label">Streak</div></div>
-      <div class="mini-stat"><div class="mini-stat-val">🪙 ${player.coins}</div><div class="mini-stat-label">Coins</div></div>
-      <div class="mini-stat"><div class="mini-stat-val">${badges.unlocked.length}/${BADGE_DEFS.length}</div><div class="mini-stat-label">Badges</div></div>
+      <div class="mini-stat"><div class="mini-stat-val">🔥 ${player.streak}</div><div class="mini-stat-label">${langText.streak}</div></div>
+      <div class="mini-stat"><div class="mini-stat-val">🪙 ${player.coins}</div><div class="mini-stat-label">${langText.coins}</div></div>
+      <div class="mini-stat"><div class="mini-stat-val">${badges.unlocked.length}/${langText.badgeDefs.length}</div><div class="mini-stat-label">${langText.badges}</div></div>
     </div>
   `;
   root.innerHTML = html;
@@ -712,13 +855,14 @@ function renderPlay(){
 }
 
 function renderRanking(){
+  const langText = I18N[currentLang] || I18N.de;
   const root = document.getElementById("view-ranking");
   const data = getRankingData();
   const medals = ["🥇","🥈","🥉"];
 
   let html = `
-    <div class="section-title" style="margin-top:16px;">🏆 Ranking</div>
-    <div class="rank-note">Hinweis: Außer dir sind dies Demo-Spieler — es gibt noch kein Live-Backend.</div>
+    <div class="section-title" style="margin-top:16px;">${langText.rankingTitle}</div>
+    <div class="rank-note">${langText.rankingNote}</div>
   `;
   root.innerHTML = html;
 
@@ -729,8 +873,8 @@ function renderRanking(){
         <div class="rank-pos">${i < 3 ? `<span class="rank-medal">${medals[i]}</span>` : (i+1)}</div>
         <div class="rank-avatar">${initials(p.name)}</div>
         <div class="rank-info">
-          <div class="rank-name">${p.isMe ? 'DU · ' + p.name : p.name}</div>
-          <div class="rank-sub">Level ${p.level}${p.demo ? ' · Demo' : ''}</div>
+          <div class="rank-name">${p.isMe ? langText.you + ' · ' + p.name : p.name}</div>
+          <div class="rank-sub">${langText.level} ${p.level}${p.demo ? ' · ' + langText.demo : ''}</div>
         </div>
         <div class="rank-xp">${p.xp} XP</div>
       </div>
@@ -741,6 +885,7 @@ function renderRanking(){
 }
 
 function renderProfile(){
+  const langText = I18N[currentLang] || I18N.de;
   const root = document.getElementById("view-profile");
   const level = getLevel(player.xp);
   const floor = levelFloor(level);
@@ -750,8 +895,8 @@ function renderProfile(){
   let html = `
     <div class="profile-header">
       <div class="avatar-lg">${initials(player.name)}</div>
-      <div class="profile-name">${player.name || "Spieler"}</div>
-      <div class="profile-level">LEVEL ${level}</div>
+      <div class="profile-name">${player.name || langText.defaultUser}</div>
+      <div class="profile-level">${langText.level.toUpperCase()} ${level}</div>
       <div class="xp-box">
         <div class="xp-box-top"><span>${player.xp} XP</span><span>${ceil} XP</span></div>
         <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -759,33 +904,34 @@ function renderProfile(){
     </div>
 
     <div class="stat-grid">
-      <div class="stat-tile"><div class="stat-tile-icon">🪙</div><div class="stat-tile-val">${player.coins}</div><div class="stat-tile-label">Coins</div></div>
-      <div class="stat-tile"><div class="stat-tile-icon">🔥</div><div class="stat-tile-val">${player.streak}</div><div class="stat-tile-label">Streak</div></div>
-      <div class="stat-tile"><div class="stat-tile-icon">🎯</div><div class="stat-tile-val">${stats.totalChallenges}</div><div class="stat-tile-label">Challenges</div></div>
-      <div class="stat-tile"><div class="stat-tile-icon">🏅</div><div class="stat-tile-val">${badges.unlocked.length}</div><div class="stat-tile-label">Badges</div></div>
+      <div class="stat-tile"><div class="stat-tile-icon">🪙</div><div class="stat-tile-val">${player.coins}</div><div class="stat-tile-label">${langText.coins}</div></div>
+      <div class="stat-tile"><div class="stat-tile-icon">🔥</div><div class="stat-tile-val">${player.streak}</div><div class="stat-tile-label">${langText.streak}</div></div>
+      <div class="stat-tile"><div class="stat-tile-icon">🎯</div><div class="stat-tile-val">${stats.totalChallenges}</div><div class="stat-tile-label">${langText.navPlay}</div></div>
+      <div class="stat-tile"><div class="stat-tile-icon">🏅</div><div class="stat-tile-val">${badges.unlocked.length}</div><div class="stat-tile-label">${langText.badges}</div></div>
     </div>
 
-    <div class="section-title">My Badges</div>
+    <div class="section-title">${langText.myBadges}</div>
     <div class="badge-grid" id="badge-grid"></div>
 
-    <div class="section-title">Player Stats</div>
+    <div class="section-title">${langText.playerStats}</div>
     <div class="playerstats-list">
-      <div class="playerstats-row"><span class="playerstats-label">Total Challenges</span><span class="playerstats-val">${stats.totalChallenges}</span></div>
-      <div class="playerstats-row"><span class="playerstats-label">Correct Answers</span><span class="playerstats-val">${stats.correctAnswers}</span></div>
-      <div class="playerstats-row"><span class="playerstats-label">Wrong Answers</span><span class="playerstats-val">${stats.wrongAnswers}</span></div>
-      <div class="playerstats-row"><span class="playerstats-label">Total XP</span><span class="playerstats-val">${stats.totalXPEarned}</span></div>
-      <div class="playerstats-row"><span class="playerstats-label">Total Coins</span><span class="playerstats-val">${stats.totalCoinsEarned}</span></div>
-      <div class="playerstats-row"><span class="playerstats-label">Best Streak</span><span class="playerstats-val">${stats.bestStreak}</span></div>
+      <div class="playerstats-row"><span class="playerstats-label">${langText.totalChallenges}</span><span class="playerstats-val">${stats.totalChallenges}</span></div>
+      <div class="playerstats-row"><span class="playerstats-label">${langText.correctAnswers}</span><span class="playerstats-val">${stats.correctAnswers}</span></div>
+      <div class="playerstats-row"><span class="playerstats-label">${langText.wrongAnswers}</span><span class="playerstats-val">${stats.wrongAnswers}</span></div>
+      <div class="playerstats-row"><span class="playerstats-label">${langText.totalXP}</span><span class="playerstats-val">${stats.totalXPEarned}</span></div>
+      <div class="playerstats-row"><span class="playerstats-label">${langText.totalCoins}</span><span class="playerstats-val">${stats.totalCoinsEarned}</span></div>
+      <div class="playerstats-row"><span class="playerstats-label">${langText.bestStreak}</span><span class="playerstats-val">${stats.bestStreak}</span></div>
     </div>
   `;
   root.innerHTML = html;
 
   const grid = document.getElementById("badge-grid");
-  BADGE_DEFS.forEach(b=>{
+  langText.badgeDefs.forEach(b=>{
     const unlocked = badges.unlocked.includes(b.id);
+    const icon = BADGE_ICONS[b.id] || "🏅";
     const tile = el(`
       <div class="badge-tile ${unlocked ? '' : 'locked'}">
-        <div class="badge-icon">${b.icon}</div>
+        <div class="badge-icon">${icon}</div>
         <div class="badge-title">${b.title}</div>
         <div class="badge-desc">${b.desc}</div>
       </div>
