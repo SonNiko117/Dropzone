@@ -298,6 +298,8 @@
 <script>
   const SUPABASE_URL = "https://aljuzdtvqjlwgkpyvorg.supabase.co";
   const SUPABASE_ANON_KEY = "ANON_KEY";
+  window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
   // WICHTIG: Nutze 'window.supabase' statt 'const supabase', um eine Doppel-Deklaration zu vermeiden:
   window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
