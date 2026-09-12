@@ -21,10 +21,10 @@ from telegram.ext import (
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Your DROPZONE Mini App URL
-GAME_URL = "YOUR_GAME_URL"
+GAME_URL = "https://sonniko117.github.io/Dropzone/"
 
 # Your DROPZONE News Channel
-NEWS_CHANNEL_URL = "YOUR_NEWS_CHANNEL"
+NEWS_CHANNEL_URL = "https://t.me/DropzoneGameNews"
 
 
 # =========================
