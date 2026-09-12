@@ -365,6 +365,10 @@ function getTelegramUser(){
    1. DICTIONARIES & TRANSLATIONS
    ========================================================= */
 const I18N = {
+/* =========================================================
+   1. DICTIONARIES & TRANSLATIONS
+   ========================================================= */
+const I18N = {
   de: {
     navPlay: "Spielen",
     navRanking: "Rangliste",
@@ -384,7 +388,7 @@ const I18N = {
     wrong: "Falsch!",
     bonusToast: "🎁 Bonus: +50 XP · +50 🪙",
     rankingTitle: "🏆 Rangliste",
-    rankingNote: "Hinweis: Außer dir sind dies Demo-Spieler — es gibt noch kein Live-Backend.",
+    rankingNote: "Live-Rangliste aller DROPZONE Spieler.",
     you: "DU",
     demo: "Demo",
     myBadges: "Meine Badges",
@@ -395,6 +399,115 @@ const I18N = {
     totalXP: "Gesamt-XP",
     totalCoins: "Gesamt-Coins",
     bestStreak: "Beste Streak",
+    categories: { wissen: "Wissen", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaktion", logik: "Logik" },
+    badgeDefs: [
+      { id:"first_drop", title:"First Drop", desc:"Erste Challenge abgeschlossen." },
+      { id:"streak7", title:"7 Day Streak", desc:"7 Tage hintereinander gespielt." },
+      { id:"quiz_master", title:"Quiz Master", desc:"50 Challenges abgeschlossen." },
+      { id:"perfect_day", title:"Perfect Day", desc:"Alle 5 Daily Challenges an einem Tag." },
+      { id:"veteran", title:"Veteran", desc:"100 Challenges abgeschlossen." },
+      { id:"coin_collector", title:"Coin Collector", desc:"1000 Coins gesammelt." }
+    ]
+  },
+  en: {
+    navPlay: "Play",
+    navRanking: "Ranking",
+    navProfile: "Profile",
+    defaultUser: "Player",
+    level: "Level",
+    dailyTitle: "🎯 Daily Challenge",
+    dailyBonusTitle: "Daily Bonus",
+    dailyBonusSub: "+50 XP · +50 Coins for all 5 challenges",
+    dailyBonusClaimed: "Already claimed today",
+    claim: "Claim",
+    claimed: "Claimed",
+    todaysChallenges: "Today's Challenges",
+    streak: "Streak",
+    coins: "Coins",
+    badges: "Badges",
+    wrong: "Wrong!",
+    bonusToast: "🎁 Bonus: +50 XP · +50 🪙",
+    rankingTitle: "🏆 Ranking",
+    rankingNote: "Live leaderboard of all DROPZONE players.",
+    you: "YOU",
+    demo: "Demo",
+    myBadges: "My Badges",
+    playerStats: "Player Stats",
+    totalChallenges: "Total Challenges",
+    correctAnswers: "Correct Answers",
+    wrongAnswers: "Wrong Answers",
+    totalXP: "Total XP",
+    totalCoins: "Total Coins",
+    bestStreak: "Best Streak",
+    categories: { wissen: "Knowledge", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaction", logik: "Logic" },
+    badgeDefs: [
+      { id:"first_drop", title:"First Drop", desc:"Completed first challenge." },
+      { id:"streak7", title:"7 Day Streak", desc:"Played 7 days in a row." },
+      { id:"quiz_master", title:"Quiz Master", desc:"Completed 50 challenges." },
+      { id:"perfect_day", title:"Perfect Day", desc:"All 5 daily challenges in one day." },
+      { id:"veteran", title:"Veteran", desc:"Completed 100 challenges." },
+      { id:"coin_collector", title:"Coin Collector", desc:"Collected 1000 coins." }
+    ]
+  },
+  ru: {
+    navPlay: "Играть",
+    navRanking: "Рейтинг",
+    navProfile: "Профиль",
+    defaultUser: "Игрок",
+    level: "Уровень",
+    dailyTitle: "🎯 Ежедневный Челлендж",
+    dailyBonusTitle: "Ежедневный Бонус",
+    dailyBonusSub: "+50 XP · +50 Монет за все 5 заданий",
+    dailyBonusClaimed: "Уже получено сегодня",
+    claim: "Забрать",
+    claimed: "Получено",
+    todaysChallenges: "Задания на сегодня",
+    streak: "Серия",
+    coins: "Монеты",
+    badges: "Значки",
+    wrong: "Неверно!",
+    bonusToast: "🎁 Бонус: +50 XP · +50 🪙",
+    rankingTitle: "🏆 Таблица лидеров",
+    rankingNote: "Живой рейтинг всех игроков DROPZONE.",
+    you: "ВЫ",
+    demo: "Демо",
+    myBadges: "Мои Значки",
+    playerStats: "Статистика",
+    totalChallenges: "Всего челленджей",
+    correctAnswers: "Правильных ответов",
+    wrongAnswers: "Неправильных ответов",
+    totalXP: "Всего XP",
+    totalCoins: "Всего монет",
+    bestStreak: "Лучшая серия",
+    categories: { wissen: "Знания", gaming: "Игры", facts: "Факты", reaktion: "Реакция", logik: "Логика" },
+    badgeDefs: [
+      { id:"first_drop", title:"Первый шаг", desc:"Завершите первый челлендж." },
+      { id:"streak7", title:"Серия 7 дней", desc:"Играйте 7 дней подряд." },
+      { id:"quiz_master", title:"Мастер викторин", desc:"Завершите 50 челленджей." },
+      { id:"perfect_day", title:"Идеальный день", desc:"Все 5 заданий за один день." },
+      { id:"veteran", title:"Ветеран", desc:"Завершите 100 челленджей." },
+      { id:"coin_collector", title:"Сборщик монет", desc:"Соберите 1000 монет." }
+    ]
+  }
+};
+
+/* =========================================================
+   2. STORAGE KEYS & HELPERS
+   ========================================================= */
+const LS_PLAYER = "dropzonePlayer";
+const LS_DAILY  = "dropzoneDaily";
+const LS_BADGES = "dropzoneBadges";
+const LS_STATS  = "dropzoneStats";
+const LS_LANG   = "dropzoneLang";
+
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed == null ? fallback : parsed;
+  }catch(e){ return fallback; }
+}
     categories: { wissen: "Wissen", gaming: "Gaming", facts: "Random Facts", reaktion: "Reaktion", logik: "Logik" },
     badgeDefs: [
       { id:"first_drop", title:"First Drop", desc:"Erste Challenge abgeschlossen." },
