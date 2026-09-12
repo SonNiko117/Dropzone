@@ -11,9 +11,9 @@ const CATEGORIES = [
 ];
 
 const TRANSLATIONS = {
-  de: { title:"Dropzone Daily", streak:"Streak", coins:"Coins", level:"Lvl", completed:"Erledigt", solve:"Lösen", correct:"Richtig!", wrong:"Falsch!" },
-  en: { title:"Dropzone Daily", streak:"Streak", coins:"Coins", level:"Lvl", completed:"Completed", solve:"Solve", correct:"Correct!", wrong:"Wrong!" },
-  ru: { title:"Dropzone Daily", streak:"Стрик", coins:"Монеты", level:"Lvl", completed:"Готово", solve:"Решить", correct:"Верно!", wrong:"Неверно!" }
+  de: { correct:"Richtig!", wrong:"Falsch!" },
+  en: { correct:"Correct!", wrong:"Wrong!" },
+  ru: { correct:"Верно!", wrong:"Неверно!" }
 };
 
 const FALLBACK_QUESTIONS = {
@@ -27,21 +27,11 @@ const FALLBACK_QUESTIONS = {
 let currentLang = "de";
 let currentQuestionBank = FALLBACK_QUESTIONS;
 
-let user = {
-  xp: 0,
-  level: 1,
-  coins: 0,
-  streak: 0,
-  lastPlayedDate: null
-};
-
-let daily = {
-  date: todayStr(),
-  challenges: []
-};
+let user = { xp: 0, level: 1, coins: 0, streak: 0, lastPlayedDate: null };
+let daily = { date: todayStr(), challenges: [] };
 
 /* =========================================================
-   2. HELPER FUNCTIONS & STORAGE
+   2. HELPER FUNCTIONS
    ========================================================= */
 function todayStr() {
   return new Date().toISOString().split('T')[0];
@@ -56,16 +46,15 @@ function seededIndex(seedStr, max) {
 }
 
 function loadAll() {
-  const u = localStorage.getItem("dz_user");
-  if (u) user = JSON.parse(u);
-
-  const d = localStorage.getItem("dz_daily");
-  if (d) {
-    const parsed = JSON.parse(d);
-    if (parsed.date === todayStr()) {
-      daily = parsed;
+  try {
+    const u = localStorage.getItem("dz_user");
+    if (u) user = JSON.parse(u);
+    const d = localStorage.getItem("dz_daily");
+    if (d) {
+      const parsed = JSON.parse(d);
+      if (parsed.date === todayStr()) daily = parsed;
     }
-  }
+  } catch(e) { console.error("Fehler beim Laden aus Speicher:", e); }
 }
 
 function saveAll() {
@@ -73,22 +62,8 @@ function saveAll() {
   localStorage.setItem("dz_daily", JSON.stringify(daily));
 }
 
-function checkStreak() {
-  const today = todayStr();
-  if (!user.lastPlayedDate) return;
-
-  const last = new Date(user.lastPlayedDate);
-  const current = new Date(today);
-  const diffDays = Math.round((current - last) / (1000 * 60 * 60 * 24));
-
-  if (diffDays > 1) {
-    user.streak = 0;
-    saveAll();
-  }
-}
-
 /* =========================================================
-   3. QUESTION BANK & DYNAMIC LOADING
+   3. DYNAMIC JSON LOADING
    ========================================================= */
 async function loadLanguageQuestions(langCode) {
   try {
@@ -102,15 +77,8 @@ async function loadLanguageQuestions(langCode) {
     currentQuestionBank = FALLBACK_QUESTIONS;
   }
 
-  // Tagesaufgaben mit der neu geladenen Sprachdatei generieren/aktualisieren
-  if (!daily.challenges || daily.challenges.length === 0 || daily.date !== todayStr()) {
-    daily.date = todayStr();
-    daily.challenges = generateDailyChallenges(todayStr());
-  } else {
-    // Fragen-Texte bei Sprachwechsel aktualisieren
-    daily.challenges = generateDailyChallenges(todayStr());
-  }
-
+  daily.date = todayStr();
+  daily.challenges = generateDailyChallenges(todayStr());
   saveAll();
   renderAll();
 }
@@ -119,7 +87,7 @@ function generateDailyChallenges(dateStr) {
   return CATEGORIES.map(cat => {
     const bank = currentQuestionBank[cat.key] || FALLBACK_QUESTIONS[cat.key] || FALLBACK_QUESTIONS.wissen;
     const idx = seededIndex(dateStr + "_" + cat.key, bank.length);
-    const item = bank[idx];
+    const item = bank[idx] || bank[0];
     
     return {
       category: cat.key,
@@ -135,32 +103,15 @@ function generateDailyChallenges(dateStr) {
   });
 }
 
-/* =========================================================
-   4. GAME LOGIC & XP/LEVEL
-   ========================================================= */
-function addXP(amount) {
-  user.xp += amount;
-  const nextLvlXp = user.level * 100;
-  if (user.xp >= nextLvlXp) {
-    user.level++;
-    user.xp -= nextLvlXp;
-  }
-}
-
 function answerQuestion(catIndex, selectedIdx) {
   const ch = daily.challenges[catIndex];
-  if (ch.completed) return;
+  if (!ch || ch.completed) return;
 
   ch.completed = true;
   if (selectedIdx === ch.correctIndex) {
     ch.wasCorrect = true;
-    addXP(ch.xp);
+    user.xp += ch.xp;
     user.coins += ch.coins;
-
-    if (user.lastPlayedDate !== todayStr()) {
-      user.streak++;
-      user.lastPlayedDate = todayStr();
-    }
   } else {
     ch.wasCorrect = false;
   }
@@ -170,18 +121,25 @@ function answerQuestion(catIndex, selectedIdx) {
 }
 
 /* =========================================================
-   5. RENDER UI
+   4. RENDER UI (MIT ABFANG-SCHUTZ)
    ========================================================= */
 function renderAll() {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.de;
 
-  // Header / Stats
-  document.getElementById("val-level").innerText = user.level;
-  document.getElementById("val-xp").innerText = user.xp + " / " + (user.level * 100);
-  document.getElementById("val-coins").innerText = user.coins;
-  document.getElementById("val-streak").innerText = user.streak;
+  // Safe Updates für Stats
+  const elLvl = document.getElementById("val-level");
+  if (elLvl) elLvl.innerText = user.level;
+  
+  const elXp = document.getElementById("val-xp");
+  if (elXp) elXp.innerText = user.xp;
 
-  // Challenge List
+  const elCoins = document.getElementById("val-coins");
+  if (elCoins) elCoins.innerText = user.coins;
+
+  const elStreak = document.getElementById("val-streak");
+  if (elStreak) elStreak.innerText = user.streak;
+
+  // Container für Fragen
   const container = document.getElementById("challenges-list");
   if (!container) return;
   container.innerHTML = "";
@@ -190,18 +148,15 @@ function renderAll() {
     const card = document.createElement("div");
     card.className = "card";
 
-    let html = `
-      <h3>${ch.catIcon} ${ch.category.toUpperCase()} (+${ch.xp} XP, +${ch.coins} Coins)</h3>
-      <p><strong>${ch.question}</strong></p>
-    `;
+    let html = `<h3>${ch.catIcon} ${ch.category.toUpperCase()}</h3><p><strong>${ch.question}</strong></p>`;
 
     if (ch.completed) {
       const statusText = ch.wasCorrect ? `✅ ${t.correct}` : `❌ ${t.wrong}`;
-      html += `<p class="status">${statusText}</p>`;
+      html += `<p>${statusText}</p>`;
     } else {
       html += `<div class="answers">`;
       ch.answers.forEach((ans, aIdx) => {
-        html += `<button onclick="answerQuestion(${idx}, ${aIdx})">${ans}</button>`;
+        html += `<button onclick="answerQuestion(${idx}, ${aIdx})" style="margin: 4px; padding: 8px;">${ans}</button>`;
       });
       html += `</div>`;
     }
@@ -212,22 +167,19 @@ function renderAll() {
 }
 
 /* =========================================================
-   6. INIT & EVENT LISTENERS
+   5. INIT
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
   loadAll();
-  checkStreak();
 
   const langSelect = document.getElementById("lang-select");
   if (langSelect) {
-    langSelect.value = currentLang;
     langSelect.addEventListener("change", (e) => {
       currentLang = e.target.value;
       loadLanguageQuestions(currentLang);
     });
   }
 
-  // Erster Start mit ausgewählter Sprache
   loadLanguageQuestions(currentLang);
 });
 </script>
