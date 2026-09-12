@@ -349,20 +349,15 @@ const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp 
 if (tg) {
   try { tg.ready(); tg.expand(); } catch(e){}
 }
-function getTelegramUser(){
-  try{
-    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      const u = tg.initDataUnsafe.user;
-      return {
-        id: String(u.id),
-        name: u.first_name || u.username || "Spieler",
-        username: u.username || null
-      };
+function getTelegramUser() {
+  try {
+    const tg = window.Telegram?.WebApp;
+    if (tg?.initDataUnsafe?.user) {
+      return tg.initDataUnsafe.user;
     }
-  }catch(e){}
+  } catch (e) {}
   return { id: "guest", name: "Spieler", username: null };
 }
-
 
 /* =========================================================
    1. DICTIONARIES & TRANSLATIONS
