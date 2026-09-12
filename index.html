@@ -485,7 +485,6 @@ const I18N = {
   }
 };
 
-
 /* =========================================================
    2. STORAGE KEYS & HELPERS
    ========================================================= */
@@ -503,8 +502,6 @@ function loadJSON(key, fallback){
     return parsed == null ? fallback : parsed;
   }catch(e){ return fallback; }
 }
-
-// ALLES DARUNTER, WAS VERDOPPELT WURDE, LÖSCHEN!
    
 function saveJSON(key, val){
   try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
