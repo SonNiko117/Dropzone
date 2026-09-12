@@ -1,7 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropzone Daily</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #3b82f6;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 500px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    h1 { margin: 0; font-size: 1.5rem; }
+    select {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--accent);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--accent); }
+    .stat-label { font-size: 0.75rem; color: var(--text-dim); }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .card h3 { margin-top: 0; font-size: 1rem; color: var(--accent); }
+    .answers { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    button {
+      background: #334155;
+      color: var(--text);
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    button:hover { background: var(--accent); }
+    .status { font-weight: bold; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <h1>Dropzone Daily</h1>
+    <select id="lang-select">
+      <option value="de">DE 🇩🇪</option>
+      <option value="en">EN 🇬🇧</option>
+      <option value="ru">RU 🇷🇺</option>
+    </select>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value" id="val-level">1</div><div class="stat-label">LVL</div></div>
+    <div class="stat-card"><div class="stat-value" id="val-xp">0</div><div class="stat-label">XP</div></div>
+    <div class="stat-card"><div class="stat-value" id="val-coins">0</div><div class="stat-label">COINS</div></div>
+    <div class="stat-card"><div class="stat-value" id="val-streak">0</div><div class="stat-label">STREAK</div></div>
+  </div>
+
+  <div id="challenges-list"></div>
+</div>
+
 <script>
-/* =========================================================
-   1. CONFIG & BASE STATES
-   ========================================================= */
 const CATEGORIES = [
   { key:"wissen",   icon:"🧠", xp:20, coins:10 },
   { key:"gaming",   icon:"🎮", xp:20, coins:10 },
@@ -26,22 +123,14 @@ const FALLBACK_QUESTIONS = {
 
 let currentLang = "de";
 let currentQuestionBank = FALLBACK_QUESTIONS;
-
 let user = { xp: 0, level: 1, coins: 0, streak: 0, lastPlayedDate: null };
 let daily = { date: todayStr(), challenges: [] };
 
-/* =========================================================
-   2. HELPER FUNCTIONS
-   ========================================================= */
-function todayStr() {
-  return new Date().toISOString().split('T')[0];
-}
+function todayStr() { return new Date().toISOString().split('T')[0]; }
 
 function seededIndex(seedStr, max) {
   let hash = 0;
-  for (let i = 0; i < seedStr.length; i++) {
-    hash = seedStr.charCodeAt(i) + ((hash << 5) - hash);
-  }
+  for (let i = 0; i < seedStr.length; i++) hash = seedStr.charCodeAt(i) + ((hash << 5) - hash);
   return Math.abs(hash) % max;
 }
 
@@ -54,7 +143,7 @@ function loadAll() {
       const parsed = JSON.parse(d);
       if (parsed.date === todayStr()) daily = parsed;
     }
-  } catch(e) { console.error("Fehler beim Laden aus Speicher:", e); }
+  } catch(e) {}
 }
 
 function saveAll() {
@@ -62,9 +151,6 @@ function saveAll() {
   localStorage.setItem("dz_daily", JSON.stringify(daily));
 }
 
-/* =========================================================
-   3. DYNAMIC JSON LOADING
-   ========================================================= */
 async function loadLanguageQuestions(langCode) {
   try {
     const res = await fetch(`questions/${langCode}.json`);
@@ -88,7 +174,6 @@ function generateDailyChallenges(dateStr) {
     const bank = currentQuestionBank[cat.key] || FALLBACK_QUESTIONS[cat.key] || FALLBACK_QUESTIONS.wissen;
     const idx = seededIndex(dateStr + "_" + cat.key, bank.length);
     const item = bank[idx] || bank[0];
-    
     return {
       category: cat.key,
       catIcon: cat.icon,
@@ -120,26 +205,14 @@ function answerQuestion(catIndex, selectedIdx) {
   renderAll();
 }
 
-/* =========================================================
-   4. RENDER UI (MIT ABFANG-SCHUTZ)
-   ========================================================= */
 function renderAll() {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.de;
 
-  // Safe Updates für Stats
-  const elLvl = document.getElementById("val-level");
-  if (elLvl) elLvl.innerText = user.level;
-  
-  const elXp = document.getElementById("val-xp");
-  if (elXp) elXp.innerText = user.xp;
+  document.getElementById("val-level").innerText = user.level;
+  document.getElementById("val-xp").innerText = user.xp;
+  document.getElementById("val-coins").innerText = user.coins;
+  document.getElementById("val-streak").innerText = user.streak;
 
-  const elCoins = document.getElementById("val-coins");
-  if (elCoins) elCoins.innerText = user.coins;
-
-  const elStreak = document.getElementById("val-streak");
-  if (elStreak) elStreak.innerText = user.streak;
-
-  // Container für Fragen
   const container = document.getElementById("challenges-list");
   if (!container) return;
   container.innerHTML = "";
@@ -152,11 +225,11 @@ function renderAll() {
 
     if (ch.completed) {
       const statusText = ch.wasCorrect ? `✅ ${t.correct}` : `❌ ${t.wrong}`;
-      html += `<p>${statusText}</p>`;
+      html += `<p class="status">${statusText}</p>`;
     } else {
       html += `<div class="answers">`;
       ch.answers.forEach((ans, aIdx) => {
-        html += `<button onclick="answerQuestion(${idx}, ${aIdx})" style="margin: 4px; padding: 8px;">${ans}</button>`;
+        html += `<button onclick="answerQuestion(${idx}, ${aIdx})">${ans}</button>`;
       });
       html += `</div>`;
     }
@@ -166,9 +239,6 @@ function renderAll() {
   });
 }
 
-/* =========================================================
-   5. INIT
-   ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
   loadAll();
 
@@ -183,3 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadLanguageQuestions(currentLang);
 });
 </script>
+
+</body>
+</html>
