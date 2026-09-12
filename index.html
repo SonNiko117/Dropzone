@@ -329,8 +329,8 @@ if (tg) {
 }
 function getTelegramUser() {
   try {
-    const tg = window.Telegram?.WebApp;
-    if (tg?.initDataUnsafe?.user) {
+    const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       return tg.initDataUnsafe.user;
     }
   } catch (e) {}
@@ -882,7 +882,7 @@ document.querySelectorAll(".nav-btn").forEach(btn=>{
 async function savePlayerToSupabase() {
   if (!window.sbClient) return;
   
-  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  const tgUser = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) ? window.Telegram.WebApp.initDataUnsafe.user : null;
   const userId = tgUser ? String(tgUser.id) : (localStorage.getItem('guest_id') || 'guest_' + Math.random().toString(36).substring(2, 11));
   
   if (!tgUser && !localStorage.getItem('guest_id')) {
@@ -892,7 +892,7 @@ async function savePlayerToSupabase() {
   const playerData = {
     id: userId,
     name: tgUser ? tgUser.first_name : (player.name || "Gast"),
-    username: tgUser?.username || null,
+    username: (tgUser && tgUser.username) || null,
     xp: player.xp,
     coins: player.coins,
     streak: player.streak,
